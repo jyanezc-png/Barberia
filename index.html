@@ -93,11 +93,16 @@ src="https://www.google.com/maps?q=-32.77972420057747,-70.95959567202357&output=
 </form>
 <script>
 const HORAS=["09:00","10:00","11:00","12:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
-function obtenerReservas(){try{return JSON.parse(localStorage.getItem('citas')||'{}')}catch(e){return {}}}
-function mostrarHoras(){
-  const f=document.getElementById('fecha').value;const div=document.getElementById('horas');div.innerHTML='';
+const API = 'https://script.google.com/macros/s/AKfycbzFOyxOd9U4xtRIMXXECtVBjDXFicsoM-Ujj55XUPtJeEFhtYvPtFyisjuAOMTxFjOoRA/exec';
+async function obtenerReservas(fecha){
+  try{const r=await fetch(API+'?fecha='+encodeURIComponent(fecha));return await r.json()}catch(e){return []}
+}
+async function mostrarHoras(){
+  const f=document.getElementById('fecha').value;const div=document.getElementById('horas');
   if(!f){div.innerHTML='<p>Selecciona una fecha</p>';return}
-  const ocupadas=obtenerReservas()[f]||[];
+  div.innerHTML='<p>Cargando...</p>';
+  const ocupadas=await obtenerReservas(f);
+  div.innerHTML='';
   HORAS.forEach(h=>{
     const b=document.createElement('button');b.type='button';b.textContent=h;
     b.style.cssText='padding:8px;border-radius:5px;border:1px solid #444;cursor:pointer;color:#eee';
@@ -111,13 +116,18 @@ function mostrarHoras(){
 }
 document.getElementById('fecha').addEventListener('change',mostrarHoras);
 document.getElementById('fecha').valueAsDate=new Date();mostrarHoras();
-document.getElementById('formCita').addEventListener('submit',e=>{
+document.getElementById('formCita').addEventListener('submit',async e=>{
   e.preventDefault();
   const f=document.getElementById('fecha').value,h=document.getElementById('horaElegida').value;
   if(!h){alert('Selecciona un horario disponible');return}
-  const r=obtenerReservas();(r[f]=r[f]||[]).push(h);localStorage.setItem('citas',JSON.stringify(r));
-  alert('¡Cita reservada para el '+f+' a las '+h+'! Te confirmaremos al '+document.getElementById('telefono').value+'.');
-  mostrarHoras();document.getElementById('horaElegida').value='';
+  const btn=e.target.querySelector('button[type=submit]');btn.disabled=true;btn.textContent='Guardando...';
+  try{
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({fecha:f,hora:h,nombre:document.getElementById('nombre').value,telefono:document.getElementById('telefono').value,servicio:document.getElementById('servicio').value})});
+    alert('¡Cita reservada para el '+f+' a las '+h+'!');
+    document.getElementById('horaElegida').value='';await mostrarHoras();
+  }catch(err){alert('Error al guardar. Intenta de nuevo.')}
+  btn.disabled=false;btn.textContent='Reservar';
 });
 </script>
 <p style="text-align:center;margin-top:20px">📍 Catemu, Chile (ver mapa) | ☎️ 555-1234 | 📧 juancarlos9290@gmail.com</p>
