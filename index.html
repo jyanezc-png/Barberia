@@ -98,18 +98,27 @@ src="https://www.google.com/maps?q=-32.77972420057747,-70.95959567202357&output=
 <input type="text" id="nombre" placeholder="Tu nombre" required>
 <input type="tel" id="telefono" placeholder="Teléfono" required>
 <select id="servicio"><option>Corte Clásico</option><option>Corte Moderno</option><option>Afeitado</option><option>Arreglo de Barba</option></select>
+<select id="barbero"><option>Carlos</option><option>Luis</option><option>Diego</option></select>
 <input type="date" id="fecha" required>
 <div><strong>Horarios disponibles:</strong></div>
 <div id="horas" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
 <input type="hidden" id="horaElegida">
 <button class="btn" type="submit">Reservar</button>
 </form>
+
+<h2 style="margin-top:25px">📅 Agenda de Hoy</h2>
+<div id="agendaHoy" style="max-width:450px;margin:auto;background:#1c1c1c;padding:15px;border-radius:8px"></div>
+
+<h2 style="margin-top:25px">❌ Cancelar Cita</h2>
+<form id="formCancel" style="display:grid;gap:10px;max-width:450px;margin:auto">
+<input type="date" id="fechaCancel" required>
+<select id="horaCancel"></select>
+<input type="tel" id="telCancel" placeholder="Tu teléfono registrado" required>
+<button class="btn" type="submit" style="background:#c0392b">Cancelar</button>
+</form>
 <script>
 const HORAS=["09:00","10:00","11:00","12:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
 const API = 'https://script.google.com/macros/s/AKfycbzFOyxOd9U4xtRIMXXECtVBjDXFicsoM-Ujj55XUPtJeEFhtYvPtFyisjuAOMTxFjOoRA/exec';
-async function obtenerReservas(fecha){
-  try{const r=await fetch(API+'?fecha='+encodeURIComponent(fecha));return await r.json()}catch(e){return []}
-}
 async function mostrarHoras(){
   const f=document.getElementById('fecha').value;const div=document.getElementById('horas');
   if(!f){div.innerHTML='<p>Selecciona una fecha</p>';return}
@@ -130,7 +139,8 @@ async function mostrarHoras(){
     div.appendChild(b);
   });
 }
-document.getElementById('fecha').addEventListener('change',mostrarHoras);
+document.getElementById('fecha').addEventListener('change',()=>{mostrarHoras()});
+document.getElementById('barbero').addEventListener('change',mostrarHoras);
 document.getElementById('fecha').valueAsDate=new Date();mostrarHoras();
 document.getElementById('formCita').addEventListener('submit',async e=>{
   e.preventDefault();
@@ -138,17 +148,39 @@ document.getElementById('formCita').addEventListener('submit',async e=>{
   if(!h){alert('Selecciona un horario disponible');return}
   const btn=e.target.querySelector('button[type=submit]');btn.disabled=true;btn.textContent='Guardando...';
   try{
-    const ocupadas=await obtenerReservas(f);
-    if(ocupadas.includes(h)){alert('⚠️ Ese horario YA ESTÁ OCUPADO. Elige otro.');await mostrarHoras();document.getElementById('horaElegida').value='';}
+    const ocupadas=await obtenerReservas(f,document.getElementById('barbero').value);
+    if(ocupadas.includes(h)){alert('⚠️ Ese horario YA ESTÁ OCUPADO con ese barbero.');await mostrarHoras();document.getElementById('horaElegida').value='';}
     else{
     await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({fecha:f,hora:h,nombre:document.getElementById('nombre').value,telefono:document.getElementById('telefono').value,servicio:document.getElementById('servicio').value})});
+      body:JSON.stringify({accion:'reservar',fecha:f,hora:h,nombre:document.getElementById('nombre').value,telefono:document.getElementById('telefono').value,servicio:document.getElementById('servicio').value,barbero:document.getElementById('barbero').value})});
     alert('¡Cita reservada para el '+f+' a las '+h+'!');
     document.getElementById('horaElegida').value='';await mostrarHoras();
     }
   }catch(err){alert('Error al guardar. Intenta de nuevo.')}
   btn.disabled=false;btn.textContent='Reservar';
 });
+async function obtenerReservas(fecha,barbero){
+  try{const r=await fetch(API+'?fecha='+encodeURIComponent(fecha)+'&barbero='+encodeURIComponent(barbero));return await r.json()}catch(e){return []}
+}
+async function cargarAgendaHoy(){
+  const div=document.getElementById('agendaHoy');div.innerHTML='Cargando...';
+  try{const r=await fetch(API+'?hoy=1');const hoy=await r.json();
+    if(!hoy.length){div.innerHTML='<p>No hay reservas hoy 🎉</p>';return}
+    div.innerHTML=hoy.map(x=>'<p>⏰ <b>'+x.hora+'</b> — '+x.nombre+' ('+x.servicio+') con '+x.barbero+'</p>').join('');
+  }catch(e){div.innerHTML='<p>Error al cargar</p>'}
+}
+cargarAgendaHoy();
+document.getElementById('formCancel').addEventListener('submit',async e=>{
+  e.preventDefault();
+  try{
+    await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({accion:'cancelar',fecha:document.getElementById('fechaCancel').value,hora:document.getElementById('horaCancel').value,telefono:document.getElementById('telCancel').value})});
+    alert('Cita cancelada. El horario quedó libre.');
+    cargarAgendaHoy();mostrarHoras();
+  }catch(err){alert('Error al cancelar')}
+});
+const horasSelect=document.getElementById('horaCancel');HORAS.forEach(h=>{const o=document.createElement('option');o.textContent=h;horasSelect.appendChild(o)});
+document.getElementById('fechaCancel').valueAsDate=new Date();
 </script>
 <p style="text-align:center;margin-top:20px">📍 Catemu, Chile (ver mapa) | ☎️ 555-1234 | 📧 juancarlos9290@gmail.com</p>
 </section>
