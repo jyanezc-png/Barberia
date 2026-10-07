@@ -106,7 +106,10 @@ async function mostrarHoras(){
   HORAS.forEach(h=>{
     const b=document.createElement('button');b.type='button';b.textContent=h;
     b.style.cssText='padding:8px;border-radius:5px;border:1px solid #444;cursor:pointer;color:#eee';
-    if(ocupadas.includes(h)){b.style.background='#5a1a1a';b.style.color='#888';b.disabled=true;b.title='Ocupado'}
+    if(ocupadas.includes(h)){
+      b.textContent=h+' — NO DISPONIBLE';
+      b.style.background='#c0392b';b.style.color='#fff';b.disabled=true;
+    }
     else{b.style.background='#1c4d1c';b.addEventListener('click',()=>{
       document.querySelectorAll('#horas button').forEach(x=>x.style.border='1px solid #444');
       b.style.border='3px solid #c9a227';document.getElementById('horaElegida').value=h;
@@ -122,10 +125,14 @@ document.getElementById('formCita').addEventListener('submit',async e=>{
   if(!h){alert('Selecciona un horario disponible');return}
   const btn=e.target.querySelector('button[type=submit]');btn.disabled=true;btn.textContent='Guardando...';
   try{
+    const ocupadas=await obtenerReservas(f);
+    if(ocupadas.includes(h)){alert('⚠️ Ese horario YA ESTÁ OCUPADO. Elige otro.');await mostrarHoras();document.getElementById('horaElegida').value='';}
+    else{
     await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({fecha:f,hora:h,nombre:document.getElementById('nombre').value,telefono:document.getElementById('telefono').value,servicio:document.getElementById('servicio').value})});
     alert('¡Cita reservada para el '+f+' a las '+h+'!');
     document.getElementById('horaElegida').value='';await mostrarHoras();
+    }
   }catch(err){alert('Error al guardar. Intenta de nuevo.')}
   btn.disabled=false;btn.textContent='Reservar';
 });
