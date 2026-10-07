@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barbería El Corte | Estilo y Tradición</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#111;color:#eee}
+header{background:#000;padding:20px;text-align:center;border-bottom:3px solid #c9a227}
+header h1{color:#c9a227;font-size:2.2em}
+nav{display:flex;justify-content:center;gap:20px;padding:12px;background:#1a1a1a;flex-wrap:wrap}
+nav a{color:#eee;text-decoration:none}
+nav a:hover{color:#c9a227}
+section{padding:40px 20px;max-width:900px;margin:auto}
+h2{color:#c9a227;margin-bottom:20px;text-align:center}
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+.card{background:#1c1c1c;padding:20px;border-radius:8px;text-align:center;border:1px solid #333}
+.card h3{color:#c9a227;margin-bottom:8px}
+table{width:100%;border-collapse:collapse}
+td,th{padding:10px;border-bottom:1px solid #333;text-align:left}
+th{color:#c9a227}
+footer{text-align:center;padding:20px;background:#000;color:#888;margin-top:30px}
+.btn{display:inline-block;background:#c9a227;color:#000;padding:10px 20px;border-radius:5px;text-decoration:none;font-weight:bold;margin-top:15px}
+form{display:grid;gap:10px;max-width:400px;margin:auto}
+input,select,textarea{padding:10px;border-radius:5px;border:1px solid #444;background:#1c1c1c;color:#eee}
+</style>
+</head>
+<body>
+<header><h1>✂️ Barbería El Corte</h1><p>Estilo y tradición desde 1995</p></header>
+<nav>
+<a href="#servicios">Servicios</a><a href="#galeria">Galería</a><a href="#precios">Precios</a><a href="#horario">Horario</a><a href="#ubicacion">Ubicación</a><a href="#contacto">Contacto</a>
+</nav>
+<section id="servicios">
+<h2>Nuestros Servicios</h2>
+<div class="services">
+<div class="card"><h3>Corte Clásico</h3><p>Corte de cabello tradicional.</p></div>
+<div class="card"><h3>Corte Moderno</h3><p>Estilos actuales y tendencias.</p></div>
+<div class="card"><h3>Afeitado</h3><p>Afeitado con navaja y toalla caliente.</p></div>
+<div class="card"><h3>Arreglo de Barba</h3><p>Perfilado y cuidado de barba.</p></div>
+</div>
+</section>
+<section id="galeria">
+<h2>Galería</h2>
+<div class="services">
+<div class="card" style="background:linear-gradient(135deg,#c9a227,#7a5c00);height:120px;display:flex;align-items:center;justify-content:center;color:#000;font-size:2em">✂️</div>
+<div class="card" style="padding:0;overflow:hidden"><img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600" alt="Corte de cabello" style="width:100%;height:120px;object-fit:cover"><p style="padding:8px">Corte de cabello</p></div>
+<div class="card" style="background:linear-gradient(135deg,#555,#222);height:120px;display:flex;align-items:center;justify-content:center;font-size:2em">💈</div>
+<div class="card" style="background:linear-gradient(135deg,#333,#000);height:120px;display:flex;align-items:center;justify-content:center;font-size:2em">🪒</div>
+<div class="card" style="background:linear-gradient(135deg,#c9a227,#5a4300);height:120px;display:flex;align-items:center;justify-content:center;font-size:2em">💇</div>
+</div>
+</section>
+<section id="ubicacion">
+<h2>Ubicación</h2>
+<iframe style="width:100%;height:300px;border:0;border-radius:8px" loading="lazy"
+src="https://www.google.com/maps?q=-32.77972420057747,-70.95959567202357&output=embed"></iframe>
+</section>
+<section id="precios">
+<h2>Precios</h2>
+<table>
+<tr><th>Servicio</th><th>Precio</th></tr>
+<tr><td>Corte Clásico</td><td>$10</td></tr>
+<tr><td>Corte Moderno</td><td>$15</td></tr>
+<tr><td>Afeitado</td><td>$8</td></tr>
+<tr><td>Arreglo de Barba</td><td>$7</td></tr>
+</table>
+</section>
+<section id="horario">
+<h2>Horario</h2>
+<table>
+<tr><th>Día</th><th>Horario</th></tr>
+<tr><td>Lunes a Viernes</td><td>9:00 - 20:00</td></tr>
+<tr><td>Sábado</td><td>9:00 - 18:00</td></tr>
+<tr><td>Domingo</td><td>Cerrado</td></tr>
+</table>
+</section>
+<section id="contacto">
+<h2>Reserva tu Cita</h2>
+<form onsubmit="event.preventDefault();alert('¡Gracias! Te confirmaremos tu cita por WhatsApp.')">
+<input type="text" placeholder="Tu nombre" required>
+<input type="tel" placeholder="Teléfono" required>
+<select><option>Corte Clásico</option><option>Corte Moderno</option><option>Afeitado</option><option>Arreglo de Barba</option></select>
+<input type="date" required>
+<button class="btn" type="submit">Reservar</button>
+</form>
+<p style="text-align:center;margin-top:20px">📍 Catemu, Chile (ver mapa) | ☎️ 555-1234 | 📧 citas@elcorte.com</p>
+</section>
+<footer>© 2026 Barbería El Corte - Todos los derechos reservados</footer>
+</body>
+</html>
